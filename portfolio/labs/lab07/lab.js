@@ -2,6 +2,27 @@
 
 */
 
+function start(e) {
+
+  $(document).mousemove(function(event){
+    var p = $( "#svgimage2" );
+
+    var position = p.position();
+
+    console.log('position = ' + position.left + ', ' + position.top);
+
+    var myX = event.pageX - Math.round(position.left); //-15
+    var myY = event.pageY - Math.round(position.top) + 500; //-15
+
+    $("#s5").html("<div style='position:absolute; border-style:none; TOP:"
+      + event.pageY + "px; LEFT:"
+      + event.pageX + "px;'>" + "&nbsp&nbsp&nbsp&nbsp("
+      + myX + ", "
+      + myY + ")"
+      + "</div>");
+
+  });
+}
 function analyze() {
     var m, n;
 
@@ -24,13 +45,59 @@ function analyze() {
       }
 
       m = remain.search(/m/i);
-      console.log('m = ' + m);
+      console.log('m  m= ' + m);
 
-      n = remain.search('z"'); // /z/i
-      console.log('n = ' + n);
+      n = remain.search(/z/i); // 'z"' /z/i
+      console.log('z  n = ' + n);
+
+      
+
+
+
 
       subs = remain.slice(m, n+1); // z 也要包含
       console.log('subs = ' + subs);
+
+      var subs2 = subs.replace('440', '480');
+      var subs2 = subs2.replace('462', '262');
+
+      var path = image.path(subs).fill('black').stroke({color:'gray', width:5}).draggable();
+
+      path.plot(subs2).draggable();
+      //path.animate(2000).plot(subs2).loop(true,true).draggable();
+
+      var newPath = Snap.path.toCubic(subs);
+      console.log(' newPath.length = ' + newPath.length);
+      //console.table(' newPath = '+ newPath);
+
+      newPath.forEach(function(element){
+        console.log(element);
+      });
+
+      for (var i = 0;i < (newPath.length - 1); i++) {
+        for(var j = 0; j < newPath[i].length; j++) {
+            console.log(' newPath[' + i + '][j]= ' + newPath[i][j] );
+        }
+    
+        //if ( newPath[i][1] == 'M' || newPath [i][1] == 'm '){ // M i == 0
+            if ( i == 0) { // M i == 0
+                var circle = image.circle(20).fill('red').stroke('blue').move(newPath[i][1]-10, newPath[i][2]-10).draggable();
+            } else { // C
+              var circle = image.circle(10).fill('pink').stroke('blue').move(newPath[i][1]-5, newPath[i][2]-5).draggable();
+              var circle = image.circle(10).fill('pink').stroke('blue').move(newPath[i][3]-5, newPath[i][4]-5).draggable();
+              var circle = image.circle(10).fill('pink').stroke('blue').move(newPath[i][5]-5, newPath[i][6]-5).draggable();
+            }
+          }
+
+          /*
+          //for(var i = 0; i < newPath.length; i++){
+          //for(var i = 0; i < (newPath.length - 1); i++){ //抵銷因為 z 而多出了的最後三個點
+          for(var i = 0; i < (newPath.length - 1); i++){ //抵銷印為 z 而多出了的最後三個點
+            var segment = newPath[i], point;
+
+            segment.shift();
+            point = setUpPoint(segment);
+          }*/
 
       remain = remain.slice(n+1); // z 也要移除
       //console.log('remain = ' + remain);
@@ -71,19 +138,14 @@ function analyze() {
       console.log('y = ' + y);
 
       var circle = image.circle(20).fill('red').stroke('blue').move(x-10, y-10).draggable();
-
-      /*
-      temp.forEach(function(element) {
-        newPath.push(element);
-      });
-      */
+      var newPath = [];
 
       console.log('newPath = ' + newPath);
 
       subs = subs.slice(m+1, n);  // C 也要移除 (大寫C), z 也要移除 
       console.log('subs = ' + subs);
 
-      temp = subs.trim().split(/\s+/);
+      temp = subs.trim().split(/\s+/);  //任何空白字元(空白,換行,tab) 等同[ \f\n\r\t\v]
 
       /*
       temp.forEach(function(element) {
@@ -108,7 +170,7 @@ function analyze() {
       }
 
       */
-    } while (m > 0);
+     }while (m > 0);
 }
 
 function saveText(text, filename) {
@@ -173,6 +235,26 @@ function handleDragOver(evt) {
 
 function start(e) {
 
+  $(document).mousemove(function(event){
+    var p = $( "#svgimage2" );
+
+    var position = p.position();
+
+    console.log('position = ' + position.left + ', ' + position.top);
+
+    var myX = event.pageX - Math.round(position.left); //-15
+    var myY = event.pageY - Math.round(position.top) + 500; //-15
+
+    $("#s5").html("<div style='position:absolute; border-style:none; TOP:"
+      + event.pageY + "px; LEFT:"
+      + event.pageX + "px;'>" + "&nbsp&nbsp&nbsp&nbsp("
+      + myX + ", "
+      + myY + ")"
+      + "</div>");
+
+  });
+
+
   document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
   var dropZone = document.getElementById('drop_zone');
@@ -203,5 +285,6 @@ function start(e) {
   }, 1000);
 
 }
+
 
 window.addEventListener( "load", start, false );
